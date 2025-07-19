@@ -2,41 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Weather App Design System - All colors, gradients, fonts, etc defined here. 
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Weather-themed background gradients */
+    --gradient-clear: linear-gradient(135deg, hsl(195, 100%, 85%) 0%, hsl(210, 100%, 90%) 100%);
+    --gradient-cloudy: linear-gradient(135deg, hsl(210, 20%, 85%) 0%, hsl(220, 15%, 92%) 100%);
+    --gradient-rainy: linear-gradient(135deg, hsl(210, 30%, 75%) 0%, hsl(220, 25%, 85%) 100%);
+    --gradient-sunny: linear-gradient(135deg, hsl(45, 90%, 85%) 0%, hsl(50, 85%, 90%) 100%);
+    
+    /* Main color palette */
+    --background: 210 100% 97%;
+    --foreground: 210 20% 15%;
 
+    /* Weather card styling */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 210 20% 15%;
+    --card-shadow: 210 25% 85%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Glass morphism effects */
+    --glass-bg: 255 255 255 / 0.15;
+    --glass-border: 255 255 255 / 0.2;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Weather-specific colors */
+    --weather-blue: 195 100% 50%;
+    --weather-blue-light: 195 100% 75%;
+    --weather-gray: 210 15% 65%;
+    --weather-orange: 45 90% 60%;
+    --weather-yellow: 50 85% 70%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Interactive elements */
+    --primary: 195 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 195 100% 45%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --secondary: 210 20% 92%;
+    --secondary-foreground: 210 20% 25%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 20% 94%;
+    --muted-foreground: 210 15% 45%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 195 80% 85%;
+    --accent-foreground: 210 20% 15%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 210 20% 88%;
+    --input: 210 20% 94%;
+    --ring: 195 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
+
+    /* Animation and transition variables */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +120,47 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    background: var(--gradient-clear);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Weather card glass morphism effect */
+  .weather-card {
+    @apply bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-lg;
+    transition: var(--transition-smooth);
+  }
+
+  .weather-card:hover {
+    @apply shadow-xl transform scale-[1.02];
+    transition: var(--transition-bounce);
+  }
+
+  /* Weather-specific background gradients */
+  .bg-clear {
+    background: var(--gradient-clear);
+  }
+
+  .bg-cloudy {
+    background: var(--gradient-cloudy);
+  }
+
+  .bg-rainy {
+    background: var(--gradient-rainy);
+  }
+
+  .bg-sunny {
+    background: var(--gradient-sunny);
+  }
+
+  /* Smooth transitions for all interactive elements */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-bounce {
+    transition: var(--transition-bounce);
   }
 }
