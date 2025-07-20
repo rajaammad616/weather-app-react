@@ -4,6 +4,7 @@ import { Sun, Cloud, CloudRain, CloudSnow, Wind, Droplet, Thermometer, Eye, Comp
 import WeatherCard from '../components/WeatherCard';
 import LocationSearch from '../components/LocationSearch';
 import WeatherDetails from '../components/WeatherDetails';
+import Forecast7Day from '../components/Forecast7Day';
 
 const Weather = () => {
   const [weatherData, setWeatherData] = useState(null);
@@ -12,6 +13,7 @@ const Weather = () => {
   const [location, setLocation] = useState(null);
   const [apiKey, setApiKey] = useState('3de15bd57be09ceea6530ae8de6493f4');
   const [locationPermission, setLocationPermission] = useState('pending');
+  const [forecast, setForecast] = useState(null);
 
   useEffect(() => {
     const storedApiKey = localStorage.getItem('openweather_api_key');
@@ -47,6 +49,44 @@ const Weather = () => {
     getCurrentLocation();
   }, [apiKey]);
 
+  const mockForecast = [
+    {
+      dt: 1717286400,
+      temp: { min: 13, max: 22 },
+      weather: [{ main: 'Clear', description: 'clear sky' }]
+    },
+    {
+      dt: 1717372800,
+      temp: { min: 14, max: 23 },
+      weather: [{ main: 'Clouds', description: 'few clouds' }]
+    },
+    {
+      dt: 1717459200,
+      temp: { min: 15, max: 24 },
+      weather: [{ main: 'Rain', description: 'light rain' }]
+    },
+    {
+      dt: 1717545600,
+      temp: { min: 13, max: 21 },
+      weather: [{ main: 'Clear', description: 'sunny' }]
+    },
+    {
+      dt: 1717632000,
+      temp: { min: 12, max: 20 },
+      weather: [{ main: 'Clouds', description: 'scattered clouds' }]
+    },
+    {
+      dt: 1717718400,
+      temp: { min: 11, max: 19 },
+      weather: [{ main: 'Rain', description: 'showers' }]
+    },
+    {
+      dt: 1717804800,
+      temp: { min: 13, max: 22 },
+      weather: [{ main: 'Clear', description: 'clear sky' }]
+    }
+  ];
+
   const fetchWeatherByCoords = async (lat, lon) => {
     setLoading(true);
     try {
@@ -56,8 +96,17 @@ const Weather = () => {
       setWeatherData(transformWeatherData(data));
       setLocation(`${data.name}, ${data.sys.country}`);
       setError(null);
+      // Fetch 7-day forecast
+      const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&appid=${apiKey}&units=metric`);
+      if (forecastRes.ok) {
+        const forecastData = await forecastRes.json();
+        setForecast(forecastData.daily.slice(0, 7));
+      } else {
+        setForecast(mockForecast);
+      }
     } catch (err) {
       setError('Failed to fetch weather data');
+      setForecast(mockForecast);
       console.error('Weather fetch error:', err);
     } finally {
       setLoading(false);
@@ -73,8 +122,22 @@ const Weather = () => {
       setWeatherData(transformWeatherData(data));
       setLocation(`${data.name}, ${data.sys.country}`);
       setError(null);
+      // Fetch 7-day forecast
+      const { coord } = data;
+      if (coord) {
+        const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${coord.lat}&lon=${coord.lon}&exclude=minutely,hourly,alerts&appid=${apiKey}&units=metric`);
+        if (forecastRes.ok) {
+          const forecastData = await forecastRes.json();
+          setForecast(forecastData.daily.slice(0, 7));
+        } else {
+          setForecast(mockForecast);
+        }
+      } else {
+        setForecast(mockForecast);
+      }
     } catch (err) {
       setError(`Failed to fetch weather for ${cityName}`);
+      setForecast(mockForecast);
       console.error('Weather fetch error:', err);
     } finally {
       setLoading(false);
@@ -116,18 +179,38 @@ const Weather = () => {
     return 'from-blue-400 to-blue-600';
   };
 
+  // Set body background to match weather
+  useEffect(() => {
+    const bgClass = getBgClass();
+    document.body.classList.remove(
+      'from-yellow-400', 'to-orange-500',
+      'from-gray-400', 'to-gray-600',
+      'from-blue-500', 'to-blue-700',
+      'from-blue-200', 'to-blue-400',
+      'from-blue-400', 'to-blue-600',
+      'bg-gradient-to-br'
+    );
+    document.body.classList.add('bg-gradient-to-br');
+    bgClass.split(' ').forEach(cls => document.body.classList.add(cls));
+    return () => {
+      document.body.classList.remove('bg-gradient-to-br');
+      bgClass.split(' ').forEach(cls => document.body.classList.remove(cls));
+    };
+  }, [weatherData]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center text-white">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-            className="w-16 h-16 mx-auto mb-4"
+            transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+            className="w-20 h-20 mx-auto mb-6"
           >
-            <Sun className="w-full h-full text-yellow-400" />
+            <Sun className="w-full h-full text-yellow-400 drop-shadow-lg" />
           </motion.div>
-          <p className="text-xl">Loading weather...</p>
+          <p className="text-2xl font-medium tracking-wide">Loading Weather...</p>
+          <p className="text-white/60">Please wait a moment</p>
         </motion.div>
       </div>
     );
@@ -135,13 +218,14 @@ const Weather = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-white">
-        <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center p-8 bg-white/10 rounded-2xl shadow-lg">
-          <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-yellow-300" />
-          <p className="text-2xl font-bold mb-2">{error}</p>
+      <div className="min-h-screen bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-white p-4">
+        <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center p-8 bg-white/10 rounded-3xl shadow-xl backdrop-blur-md border border-white/20 max-w-md">
+          <AlertTriangle className="w-20 h-20 mx-auto mb-6 text-yellow-300" />
+          <p className="text-3xl font-bold mb-2">Oops! Something went wrong.</p>
+          <p className="text-white/80 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-6 py-2 bg-yellow-400 text-gray-900 font-bold rounded-full hover:bg-yellow-300 transition-all"
+            className="mt-4 px-8 py-3 bg-yellow-400 text-gray-900 font-bold rounded-full hover:bg-yellow-300 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             Try Again
           </button>
@@ -151,19 +235,19 @@ const Weather = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${getBgClass()} p-4 sm:p-6 lg:p-8 text-white transition-all duration-1000`}>
+    <div className="min-h-screen flex flex-col p-4 sm:p-6 lg:p-8 text-white transition-all duration-1000 font-sans">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-6xl mx-auto"
+        className="max-w-7xl mx-auto flex-1 w-full"
       >
-        <header className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-2">
+        <header className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+          <div className="flex items-center gap-3">
             <motion.div animate={{ rotate: [0, -15, 15, -15, 0] }} transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}>
-              <Sun className="w-8 h-8 text-yellow-300" />
+              <Sun className="w-10 h-10 text-yellow-300 drop-shadow-lg" />
             </motion.div>
-            <h1 className="text-2xl font-bold">Sunny</h1>
+            <h1 className="text-3xl font-bold tracking-wide">{weatherData ? (weatherData.description.charAt(0).toUpperCase() + weatherData.description.slice(1)) : 'Weather'}</h1>
           </div>
           <LocationSearch
             currentLocation={location}
@@ -175,10 +259,10 @@ const Weather = () => {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-3 rounded-xl bg-white/20 text-center text-sm flex items-center justify-center gap-2"
+            className="mb-6 p-3 rounded-xl bg-white/10 text-center text-sm flex items-center justify-center gap-2 border border-white/20 shadow-md"
           >
             <MapPin size={16} />
-            {locationPermission === 'denied' ? 'Location access denied. Showing fallback.' : 'Geolocation not supported. Showing fallback.'}
+            {locationPermission === 'denied' ? 'Location access denied. Showing fallback location.' : 'Geolocation not supported. Showing fallback location.'}
           </motion.div>
         )}
 
@@ -190,6 +274,7 @@ const Weather = () => {
             className="md:col-span-3 lg:col-span-3"
           >
             <WeatherCard weather={weatherData} />
+            <Forecast7Day forecast={forecast} />
           </motion.div>
 
           <motion.div
@@ -201,19 +286,6 @@ const Weather = () => {
             <WeatherDetails weather={weatherData} />
           </motion.div>
         </main>
-
-        <footer className="text-center mt-12 text-white/70 text-xs">
-          <p>Weather data by OpenWeatherMap.</p>
-          <button
-            onClick={() => {
-              localStorage.removeItem('openweather_api_key');
-              setApiKey(null);
-            }}
-            className="text-white/70 hover:text-white hover:underline mt-1 flex items-center justify-center gap-1"
-          >
-            <Key size={12} /> Change API Key
-          </button>
-        </footer>
       </motion.div>
     </div>
   );

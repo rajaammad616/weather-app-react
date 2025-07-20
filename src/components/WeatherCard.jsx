@@ -18,56 +18,80 @@ const WeatherCard = ({ weather }) => {
 
   return (
     <motion.div
-      initial={{ backdropFilter: 'blur(0px)', WebkitBackdropFilter: 'blur(0px)' }}
-      animate={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
-      transition={{ duration: 0.8 }}
-      className="bg-white/20 p-6 sm:p-8 rounded-3xl shadow-lg h-full flex flex-col justify-between"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, type: 'spring' }}
+      whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
+      className="bg-white/10 p-8 sm:p-12 rounded-3xl shadow-2xl h-full flex flex-col justify-between border border-white/30 backdrop-blur-lg max-h-[85vh] overflow-auto"
     >
       <div>
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start mb-6">
           <div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white">{weather.location}</h2>
-            <p className="text-white/80">{weather.country}</p>
+            <h2 className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg">{weather.location}</h2>
+            <p className="text-white/70 font-medium text-lg">{weather.country}</p>
           </div>
-          <div className="text-lg font-medium bg-white/20 px-3 py-1 rounded-full">{new Date().toLocaleDateString('en-US', { weekday: 'long' })}</div>
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 120 }}
+            className="text-base font-semibold bg-white/20 px-5 py-2 rounded-full shadow border border-white/30"
+          >
+            {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+          </motion.div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center my-8 sm:my-12 text-center sm:text-left">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center my-10 text-center sm:text-left gap-8">
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}
+          >
             {getWeatherIcon(weather.condition)}
           </motion.div>
-          <div className="sm:ml-8 mt-6 sm:mt-0">
-            <p className="text-7xl sm:text-8xl font-extrabold text-white tracking-tighter">{weather.temperature}°</p>
-            <p className="text-xl text-white/90 capitalize">{weather.description}</p>
-            <p className="text-sm text-white/70">
-              Feels like {weather.feels_like}°C
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="sm:ml-8 mt-8 sm:mt-0"
+          >
+            <motion.p
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
+              className="text-8xl sm:text-9xl font-extrabold text-white tracking-tighter leading-none drop-shadow-xl"
+            >
+              {weather.temperature}°
+            </motion.p>
+            <p className="text-2xl text-white/90 capitalize font-light mt-2">{weather.description}</p>
+            <p className="text-lg text-white/70 mt-2 font-medium">
+              Feels like <span className="font-bold">{weather.feels_like}°C</span>
             </p>
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-white">
-        <div className="flex items-center gap-3 p-3 bg-white/10 rounded-xl">
-          <Wind size={24} />
-          <div>
-            <span className="text-sm text-white/80">Wind</span>
-            <p className="font-bold">{weather.windSpeed} km/h</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 p-3 bg-white/10 rounded-xl">
-          <Droplet size={24} />
-          <div>
-            <span className="text-sm text-white/80">Humidity</span>
-            <p className="font-bold">{weather.humidity}%</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 p-3 bg-white/10 rounded-xl col-span-2 sm:col-span-1">
-          <Thermometer size={24} />
-          <div>
-            <span className="text-sm text-white/80">Pressure</span>
-            <p className="font-bold">{weather.pressure} hPa</p>
-          </div>
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 text-white mt-6">
+        {[{
+          icon: <Wind size={40} className="text-white/80" />, label: 'Wind', value: `${weather.windSpeed} km/h`
+        }, {
+          icon: <Droplet size={40} className="text-white/80" />, label: 'Humidity', value: `${weather.humidity}%`
+        }, {
+          icon: <Thermometer size={40} className="text-white/80" />, label: 'Pressure', value: `${weather.pressure} hPa`
+        }].map((item, idx) => (
+          <motion.div
+            key={item.label}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 + idx * 0.15, duration: 0.5 }}
+            className={`flex flex-col items-center gap-4 p-8 bg-white/10 rounded-3xl backdrop-blur-md shadow-lg border border-white/20${item.label === 'Pressure' ? ' col-span-2 sm:col-span-1' : ''}`}
+          >
+            {item.icon}
+            <div className="text-center">
+              <span className="text-lg text-white/80">{item.label}</span>
+              <p className="font-bold text-2xl mt-1">{item.value}</p>
+            </div>
+          </motion.div>
+        ))}
       </div>
     </motion.div>
   );
