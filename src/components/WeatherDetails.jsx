@@ -36,13 +36,13 @@ const WeatherDetails = ({ weather }) => {
 
   return (
     <motion.div
-      className="bg-white/10 p-8 rounded-3xl shadow-2xl backdrop-blur-lg h-full border border-white/30 max-h-[85vh] overflow-auto overflow-x-hidden"
+      className="bg-white/10 p-4 sm:p-8 rounded-3xl shadow-2xl backdrop-blur-lg h-full border border-white/30 max-h-[85vh] overflow-auto overflow-x-hidden"
       initial={{ opacity: 0, x: 40 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.8, type: 'spring' }}
       whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
     >
-      <h3 className="text-2xl font-bold text-white mb-6">
+      <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">
         Weather Details
       </h3>
       <div className="grid gap-6">
@@ -58,9 +58,9 @@ const WeatherDetails = ({ weather }) => {
               <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 shadow-md">
                 <detail.Icon size={22} className="text-white" />
               </span>
-              <span className="text-lg text-white/80 font-medium">{detail.label}</span>
+              <span className="text-base sm:text-lg text-white/80 font-medium">{detail.label}</span>
             </div>
-            <span className="font-bold text-white text-xl">
+            <span className="font-bold text-white text-lg sm:text-xl">
               {detail.value}
             </span>
           </motion.div>

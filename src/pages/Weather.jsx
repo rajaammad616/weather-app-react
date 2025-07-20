@@ -266,7 +266,7 @@ const Weather = () => {
           </motion.div>
         )}
 
-        <main className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
+        <main className="flex flex-col gap-8 md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-6">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

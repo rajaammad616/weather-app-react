@@ -22,13 +22,13 @@ const WeatherCard = ({ weather }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, type: 'spring' }}
       whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
-      className="bg-white/10 p-8 sm:p-12 rounded-3xl shadow-2xl h-full flex flex-col justify-between border border-white/30 backdrop-blur-lg max-h-[85vh] overflow-auto"
+      className="bg-white/10 p-4 sm:p-8 md:p-12 rounded-3xl shadow-2xl h-full flex flex-col justify-between border border-white/30 backdrop-blur-lg max-h-[85vh] overflow-auto"
     >
       <div>
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg">{weather.location}</h2>
-            <p className="text-white/70 font-medium text-lg">{weather.country}</p>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg">{weather.location}</h2>
+            <p className="text-white/70 font-medium text-base sm:text-lg">{weather.country}</p>
           </div>
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
@@ -58,19 +58,19 @@ const WeatherCard = ({ weather }) => {
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
-              className="text-8xl sm:text-9xl font-extrabold text-white tracking-tighter leading-none drop-shadow-xl"
+              className="text-5xl sm:text-8xl md:text-9xl font-extrabold text-white tracking-tighter leading-none drop-shadow-xl"
             >
               {weather.temperature}°
             </motion.p>
-            <p className="text-2xl text-white/90 capitalize font-light mt-2">{weather.description}</p>
-            <p className="text-lg text-white/70 mt-2 font-medium">
+            <p className="text-lg sm:text-2xl text-white/90 capitalize font-light mt-2">{weather.description}</p>
+            <p className="text-base sm:text-lg text-white/70 mt-2 font-medium">
               Feels like <span className="font-bold">{weather.feels_like}°C</span>
             </p>
           </motion.div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 text-white mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 text-white mt-6 w-full">
         {[{
           icon: <Wind size={40} className="text-white/80" />, label: 'Wind', value: `${weather.windSpeed} km/h`
         }, {
